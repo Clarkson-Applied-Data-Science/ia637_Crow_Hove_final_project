@@ -14,3 +14,4 @@ We chose to do a Hotel Reservation System.
 
 ## Relational Schema
 ![img](relational.png)
+
