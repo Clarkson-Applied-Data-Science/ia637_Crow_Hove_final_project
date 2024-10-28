@@ -1,10 +1,11 @@
 CREATE TABLE hotel_users
 (
-  u_id INT NOT NULL,
-  name INT NOT NULL,
-  phone INT NOT NULL,
-  email INT NOT NULL,
-  user_type INT NOT NULL,
+  uid  NOT NULL AUTO_INCREMENT,
+  password VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  phone VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  role VARCHAR(30) NOT NULL,
   membership_type INT NOT NULL,
   discount_rate INT NOT NULL,
   free_wifi INT NOT NULL,
@@ -12,7 +13,7 @@ CREATE TABLE hotel_users
   points_available INT NOT NULL,
   total_points_gained INT NOT NULL,
   total_points_used INT NOT NULL,
-  PRIMARY KEY (u_id)
+  PRIMARY KEY (uid)
 ) ENGINE=MyISAM;
 
 CREATE TABLE hotel_reservations
@@ -24,7 +25,7 @@ CREATE TABLE hotel_reservations
   payment_date INT NOT NULL,
   amount INT NOT NULL,
   points_gained INT NOT NULL,
-  u_id INT NOT NULL,
+  uid INT NOT NULL,
   PRIMARY KEY (res_id)
 ) ENGINE=MyISAM;
 
@@ -34,7 +35,7 @@ CREATE TABLE hotel_rewards_redeemed
   rewards_claimed INT NOT NULL,
   description INT NOT NULL,
   points_used INT NOT NULL,
-  u_id INT NOT NULL,
+  uid INT NOT NULL,
   PRIMARY KEY (transaction_id)
 ) ENGINE=MyISAM;
 
