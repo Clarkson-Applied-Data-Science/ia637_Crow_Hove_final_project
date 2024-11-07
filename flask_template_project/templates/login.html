@@ -1,7 +1,8 @@
 {% extends "loginbase.html" %}
 
 {% block content %}
-    <h1>Login</h1>
+	<a href="/users/signup?action=insert">Create New User</a><br>
+	<h1>Login</h1>
 	{% if msg %}
       <div id="loginmsg">
 	 
@@ -20,5 +21,5 @@
 		<input type="submit" value="Login"/>
 
 	</form>
-		
+
 {% endblock %}

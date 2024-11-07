@@ -1,0 +1,10 @@
+db:
+  host: 'mysql.clarksonmsda.org'
+  user: 'ia637'
+  passwd: 'ia637clarkson'
+  db: 'ia637'
+  port: 3306
+tables:
+  user: 'hotel_users'
+  room: 'hotel_rooms'
+

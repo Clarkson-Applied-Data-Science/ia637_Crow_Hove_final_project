@@ -5,6 +5,7 @@ from flask_session import Session
 from datetime import timedelta
 from user import user
 import time
+from rooms import room
 
 #create Flask app instance
 app = Flask(__name__,static_url_path='')
@@ -27,18 +28,6 @@ def home(): #view function
 def inject_user():
     return dict(me=session.get('user'))
 
-'''
-- DDL (init) script
-- MyISAM engine
-- no referential integrity in create statement
-
-TODO:
--show login form
--check login on submit
-    -set session if login ok
--redirect to menu
--check session on login required pages
-'''
 @app.route('/login',methods = ['GET','POST'])
 def login():
     if request.form.get('name') is not None and request.form.get('password') is not None:
@@ -123,6 +112,73 @@ def manage_user():
         print(pkval)
         o.getById(pkval)
         return render_template('users/manage.html',obj = o)
+
+@app.route('/users/signup',methods=['GET','POST'])
+def signup_user():
+    o = user()
+    if request.method == 'POST':
+        d = {}
+        d['name'] = request.form.get('name')
+        d['role'] = request.form.get('role')
+        d['password'] = request.form.get('password')
+        d['password2'] = request.form.get('password2')
+        d['phone'] = request.form.get('phone')
+        d['email'] = request.form.get('email')
+        o.set(d)
+        if o.verify_new():
+            o.insert()
+            return render_template('ok_dialog.html',msg= "User Created.")
+        else:
+            return render_template('users/signup.html',obj = o)
+    o.createBlank()
+    return render_template('users/signup.html',obj = o)
+
+@app.route('/rooms/manage',methods=['GET','POST'])
+def manage_rooms():
+    if checkSession() == False or session['user']['role'] != 'admin': 
+        return redirect('/login')
+    o = room()
+    action = request.args.get('action')
+    pkval = request.args.get('pkval')
+    if action is not None and action == 'delete': #action=delete&pkval=123
+        o.deleteById(request.args.get('pkval'))
+        return render_template('ok_dialog.html',msg= "Deleted.")
+    if action is not None and action == 'insert':
+        d = {}
+        d['room_num'] = request.form.get('room_num')
+        d['price'] = request.form.get('price')
+        d['status'] = request.form.get('status')
+        d['room_type'] = request.form.get('room_type')
+        d['description'] = request.form.get('description')
+        o.set(d)
+        if o.verify_new():
+            o.insert()
+            return render_template('ok_dialog.html',msg= "Room added.")
+        else:
+            return render_template('rooms/add.html',obj = o)
+    if action is not None and action == 'update':
+        o.getById(pkval)
+        o.data[0]['room_num'] = request.form.get('room_num')
+        o.data[0]['price'] = request.form.get('price')
+        o.data[0]['status'] = request.form.get('status')
+        o.data[0]['room_type'] = request.form.get('room_type')
+        o.data[0]['description'] = request.form.get('description')
+        if o.verify_update():
+            o.update()
+            return render_template('ok_dialog.html',msg= "Room updated. <")
+        else:
+            return render_template('rooms/manage.html',obj = o)
+        
+    if pkval is None: #list all items
+        o.getAll()
+        return render_template('rooms/list.html',objs = o)
+    if pkval == 'new':
+        o.createBlank()
+        return render_template('rooms/add.html',obj = o)
+    else:
+        print(pkval)
+        o.getById(pkval)
+        return render_template('rooms/manage.html',obj = o)
 
 # endpoint route for static files
 @app.route('/static/<path:path>')
