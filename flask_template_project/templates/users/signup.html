@@ -12,23 +12,24 @@
                 <form action="/users/signup?action=insert" method="POST">
                     Name:<br>
                     <input type="text" name="name" value="{{ obj.data[0].name }}" />
-                    <br>
+                    <br><br>
 
                     Password:<br>
                     <input type="password" name="password" value="" />
-                    <br>
+                    <br><br>
 
                     Retype Password:<br>
                     <input type="password" name="password2" value="" />
-                    <br>
+                    <br><br>
                     
                     Phone:<br>
                     <input type="text" name="phone" value="" />
-                    <br>
+                    <br><br>
 
                     Email:<br>
                     <input type="text" name="email" value="" />
-                    <br> 
+                    <br><br>
+                    
                     Role:<br>
                     <select name="role">
                         {% for role in obj.roles %}

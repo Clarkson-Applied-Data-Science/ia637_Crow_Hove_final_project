@@ -7,4 +7,6 @@ db:
 tables:
   user: 'hotel_users'
   room: 'hotel_rooms'
+  reservation: 'hotel_reservations'
+
 

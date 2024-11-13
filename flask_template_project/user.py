@@ -1,12 +1,15 @@
 import hashlib
 from baseObject import baseObject
 class user(baseObject):
+
     def __init__(self):
         self.setup()
         self.roles = [{'value':'admin','text':'admin'},{'value':'customer','text':'customer'}]
+
     def hashPassword(self,pw):
         pw = pw+'xyz'
         return hashlib.md5(pw.encode('utf-8')).hexdigest()
+    
     def verify_new(self,n=0):
         self.errors = []
 
@@ -29,13 +32,12 @@ class user(baseObject):
         if self.data[n]['role'] not in rl:
             self.errors.append(f'Role must be one of {rl}')
     
-        
-
         ##Include this in verify:
         if len(self.errors) > 0:
             return False
         else:
             return True
+        
     def verify_update(self,n=0):
         self.errors = []
 
@@ -47,7 +49,6 @@ class user(baseObject):
             if len(u.data) > 0 and u.data[0][u.pk] != self.data[n][self.pk]:
                 self.errors.append('Name already in use.')
         
-       
         rl = []
         for role in self.roles:
             rl.append(role['value'])

@@ -16,12 +16,13 @@ class baseObject:
         self.data = []
         self.establishConnection()
         self.getFields()
-    def establishConnection(self):
+    def establishConnection(self): 
         config = self.config
         #print(config)
         self.conn = pymysql.connect(host=config['db']['host'], port=config['db']['port'], user=config['db']['user'],
-                       passwd=config['db']['passwd'], db=config['db']['db'], autocommit=True)
-        self.cur = self.conn.cursor(pymysql.cursors.DictCursor) 
+                    passwd=config['db']['passwd'], db=config['db']['db'], autocommit=True)
+        self.cur = self.conn.cursor(pymysql.cursors.DictCursor)  
+
     def set(self,d):
         self.data.append(d)
     def getFields(self):

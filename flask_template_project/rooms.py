@@ -1,9 +1,11 @@
 import hashlib
 from baseObject import baseObject
 class room(baseObject):
+    
     def __init__(self):
         self.setup()
         self.room_types = [{'value':'Standard','text':'Standard'},{'value':'Exclusive','text':'Exclusive'}]
+
     def verify_new(self,n=0):
         self.errors = []
         ##Include this in verify:
@@ -11,6 +13,7 @@ class room(baseObject):
             return False
         else:
             return True
+        
     def verify_update(self,n=0):
         self.errors = []
 

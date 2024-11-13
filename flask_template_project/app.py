@@ -2,10 +2,11 @@ from flask import Flask
 from flask import render_template
 from flask import request,session, redirect,send_from_directory,make_response 
 from flask_session import Session
-from datetime import timedelta
+from datetime import timedelta, datetime
 from user import user
 import time
 from rooms import room
+from reservations import reservation
 
 #create Flask app instance
 app = Flask(__name__,static_url_path='')
@@ -21,13 +22,26 @@ sess.init_app(app)
 #Basic root route - show the word 'homepage'
 @app.route('/')  #route name
 def home(): #view function
-    return 'homepage'
+    #return 'homepage'
+    return render_template('homepage.html')   
 
 
 @app.context_processor
 def inject_user():
     return dict(me=session.get('user'))
 
+'''
+- DDL (init) script
+- MyISAM engine
+- no referential integrity in create statement
+
+TODO:
+-show login form
+-check login on submit
+    -set session if login ok
+-redirect to menu
+-check session on login required pages
+'''
 @app.route('/login',methods = ['GET','POST'])
 def login():
     if request.form.get('name') is not None and request.form.get('password') is not None:
@@ -179,6 +193,76 @@ def manage_rooms():
         print(pkval)
         o.getById(pkval)
         return render_template('rooms/manage.html',obj = o)
+    
+
+@app.route('/reservations/manage',methods=['GET','POST'])
+def manage_reserve():
+    if checkSession() == False or session['user']['role'] != 'admin': 
+        return redirect('/login')
+    o = reservation()
+    action = request.args.get('action')
+    pkval = request.args.get('pkval')
+    u = user()
+    u.getAll()
+    o.guests = u
+    r = room()
+    r.getAll()
+    o.rooms= r
+    if action is not None and action == 'delete': #action=delete&pkval=123
+        o.deleteById(request.args.get('pkval'))
+        return render_template('ok_dialog.html',msg= "Deleted.")
+    if action is not None and action == 'insert':
+        d = {}
+        d['uid'] = request.form.get('uid')
+        d['room_id'] = request.form.get('room_id')
+        d['check_in_date'] = request.form.get('check_in_date')
+        d['check_out_date'] = request.form.get('check_out_date')
+        d['payment_method'] = request.form.get('payment_method')
+        d['payment_date'] = request.form.get('payment_date')
+        d['amount'] = request.form.get('amount')
+        o.set(d)
+        if o.verify_new():
+            o.insert()
+            return render_template('ok_dialog.html',msg= "Reservation added.")
+        else:
+            return render_template('reservations/add.html',obj = o)
+    if action is not None and action == 'update':
+        o.getById(pkval)
+        d['uid'] = request.form.get('uid')
+        d['room_id'] = request.form.get('room_id')
+        o.data[0]['check_in_date'] = request.form.get('check_in_date')
+        o.data[0]['check_out_date'] = request.form.get('check_out_date')
+        o.data[0]['payment_method'] = request.form.get('payment_method')
+        o.data[0]['payment_date'] = request.form.get('payment_date')
+        o.data[0]['amount'] = request.form.get('amount')
+        if o.verify_update():
+            o.update()
+            return render_template('ok_dialog.html',msg= "Reservation updated. <")
+        else:
+            return render_template('reservations/manage.html',obj = o)
+        
+    if pkval is None: #list all items
+        o.getAll()
+        return render_template('reservations/list.html',objs = o)
+    if pkval == 'new':
+        o.createBlank()
+        return render_template('reservations/add.html',obj = o)
+    else:
+        print(pkval)
+        o.getById(pkval)
+        return render_template('reservations/manage.html',obj = o)
+
+@app.template_filter('format_date')
+def format_date(value, format='%Y-%m-%d'):
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%Y-%m-%d')
+        except ValueError:
+            return value  # Return the original string if parsing fails
+    return value.strftime(format) if isinstance(value, datetime) else value
+app.jinja_env.filters['format_date'] = format_date
+   
+
 
 # endpoint route for static files
 @app.route('/static/<path:path>')
